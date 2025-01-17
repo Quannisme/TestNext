@@ -1,60 +1,32 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { motion } from "framer-motion";
-
-interface Invoice {
-  id: number;
-  clientName: string;
-  date: string;
-  dueDate: string;
-  total: string;
-  balance: string;
-  status: "Draft" | "Paid" | "Partial Payment";
-}
+import { toast } from "react-toastify";
+import * as service from "../../service/student.service";
 
 export default function InvoiceTable() {
-  const [invoices] = useState<Invoice[]>([
-    {
-      id: 12,
-      clientName: "Thomas Lynol",
-      date: "5/11/2019",
-      dueDate: "12/11/2019",
-      total: "$678.00",
-      balance: "$678.00",
-      status: "Draft",
-    },
-    {
-      id: 13,
-      clientName: "Jason Jemol",
-      date: "5/11/2019",
-      dueDate: "12/11/2019",
-      total: "$245.00",
-      balance: "$245.00",
-      status: "Paid",
-    },
-    {
-      id: 14,
-      clientName: "Michael Serkes",
-      date: "5/11/2019",
-      dueDate: "12/11/2019",
-      total: "$678.00",
-      balance: "$678.00",
-      status: "Partial Payment",
-    },
-    {
-      id: 15,
-      clientName: "Jensen Clark",
-      date: "5/11/2019",
-      dueDate: "12/11/2019",
-      total: "$978.00",
-      balance: "$978.00",
-      status: "Draft",
-    },
-  ]);
+  const [students, setStudents] = useState([]);
+  useEffect(() => {
+    getAll();
+  }, []);
+  const getAll = async () => {
+    const result = await service.findAll();
+    console.log("1", result);
 
+    setStudents(result);
+  };
+  const deleteStudent = async (id: string) => {
+    const result = await service.deleteStudent(id);
+    console.log("2", result.message);
+    if (result.message === "success") {
+      console.log("kakakak");
+      toast.success("Deleted Successfully");
+    }
+    getAll();
+  };
   return (
     <div className="w-full max-w-6xl mx-auto p-6 space-y-8">
       <div className="bg-red-50 rounded-lg p-6 relative overflow-hidden">
@@ -77,7 +49,6 @@ export default function InvoiceTable() {
               <option value="paid">Paid</option>
               <option value="partial">Partial Payment</option>
             </Select>
-            <Button variant="outline">Create New</Button>
           </div>
         </div>
         <img
@@ -96,78 +67,69 @@ export default function InvoiceTable() {
         >
           <thead>
             <tr className="border-b">
-              <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">
-                Invoice #
+              <th className="px-6 py-4 text-center text-sm font-medium text-gray-500">
+                Student ID
               </th>
-              <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">
-                Client name
+              <th className="px-6 py-4 text-center text-sm font-medium text-gray-500">
+                Student name
               </th>
-              <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">
-                Date
+              <th className="px-6 py-4 text-center text-sm font-medium text-gray-500">
+                Age
               </th>
-              <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">
-                Due date
+              <th className="px-6 py-4 text-center text-sm font-medium text-gray-500">
+                Email
               </th>
-              <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">
-                Total
+              <th className="px-6 py-4 text-center text-sm font-medium text-gray-500">
+                Courses
               </th>
-              <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">
-                Balance
-              </th>
-              <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">
-                Status
+              <th className="px-6 py-4 text-center text-sm font-medium text-gray-500">
+                Actions
               </th>
             </tr>
           </thead>
           <tbody>
-            {invoices.map((invoice, index) => (
+            {students.map((student, index) => (
               <motion.tr
-                key={invoice.id}
+                key={index}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: index * 0.1 }}
                 className="group hover:bg-gray-50 transition-colors"
               >
-                <td className="px-6 py-4 text-sm text-gray-900">
-                  {invoice.id}
+                <td className="px-6 py-4 text-sm text-gray-900 flex items-center justify-center">
+                  {student.id}
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-900">
-                  {invoice.clientName}
+                  {student.name}
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-500">
-                  {invoice.date}
+                  {student.age}
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-500">
-                  {invoice.dueDate}
+                  {student.email}
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-900">
-                  {invoice.total}
+                  {student.courses.map((course, index) => {
+                    return (
+                      <div
+                        key={index}
+                        className="flex gap-2 items-center text-gray-500"
+                      >
+                        {course.id}
+                      </div>
+                    );
+                  })}
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-900">
-                  {invoice.balance}
-                </td>
-                <td className="px-6 py-4">
-                  <span
-                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                      ${
-                        invoice.status === "Draft"
-                          ? "bg-red-100 text-red-800"
-                          : ""
-                      }
-                      ${
-                        invoice.status === "Paid"
-                          ? "bg-blue-100 text-blue-800"
-                          : ""
-                      }
-                      ${
-                        invoice.status === "Partial Payment"
-                          ? "bg-purple-100 text-purple-800"
-                          : ""
-                      }
-                    `}
-                  >
-                    {invoice.status}
-                  </span>
+                  <div className="flex gap-5 items-center justify-center">
+                    <Button variant="outline">Update</Button>
+                    <Button
+                      variant="destructive"
+                      onClick={() => deleteStudent(student.id)}
+                    >
+                      Delete
+                    </Button>
+                  </div>
                 </td>
               </motion.tr>
             ))}
