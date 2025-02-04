@@ -6,6 +6,10 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as serviceCourses from "../../service/course.service";
 import * as serviceStudent from "../../service/student.service";
 export default function hookService() {
+  const [file, setFile] = useState<File | null>(null);
+
+  // State to store the base64
+  const [base64, setBase64] = useState<string | null>(null);
   const schema = yup.object().shape({
     name: yup.string().required("Name is required"),
     age: yup
@@ -16,6 +20,7 @@ export default function hookService() {
       .min(18, "Must be more than 18")
       .max(50, "Must be less than 50"),
     email: yup.string().email("Invalid email").required("Email is required"),
+    image: yup.string().required("Image is required"),
     courses: yup
       .array()
       .min(1, "At least one course must be selected")
@@ -74,13 +79,52 @@ export default function hookService() {
   function removeCourse(courseId: string) {
     setSelectCourses((prev) => prev.filter((course) => course.id !== courseId));
   }
+  const toBase64 = (file: File) => {
+    return new Promise((resolve, reject) => {
+      const fileReader = new FileReader();
+
+      fileReader.readAsDataURL(file);
+
+      fileReader.onload = () => {
+        resolve(fileReader.result);
+      };
+
+      fileReader.onerror = (error) => {
+        reject(error);
+      };
+    });
+  };
 
   async function onSubmit(data: Omit<Student, "id">) {
-    console.log(data.courses);
-    const formData = {
-      ...data,
-    };
-    await serviceStudent.createStudent(formData);
+    const base64 = await toBase64(file as File);
+    console.log(base64);
+    const formData = new FormData();
+    formData.append("name", data.name);
+    formData.append("age", data.age.toString());
+    formData.append("email", data.email);
+    formData.append("image", JSON.stringify(base64));
+    formData.append("courses", JSON.stringify(data.courses));
+
+    // // Append the image file if exists
+    // const imageInput = document.getElementById("image") as HTMLInputElement;
+    // if (imageInput?.files?.[0]) {
+    //   formData.append("file", imageInput.files[0]);
+    // }
+
+    try {
+      const response = await serviceStudent.createStudent({
+        name: formData.get("name"),
+        age: Number(formData.get("age")),
+        email: formData.get("email"),
+        image: formData.get("image"),
+        courses: formData.get("courses"),
+      });
+      setFile(null);
+      setBase64(null);
+      console.log("Student created successfully", response);
+    } catch (error) {
+      console.error("Error creating student:", error);
+    }
   }
 
   return {
@@ -94,5 +138,7 @@ export default function hookService() {
     selectCourses,
     removeCourse,
     handleCourseSelect,
+    file,
+    setFile,
   };
 }

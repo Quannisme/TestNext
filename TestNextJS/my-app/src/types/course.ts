@@ -8,5 +8,6 @@ export interface Student {
   name: string;
   age: number;
   email: string;
+  image: string;
   courses: { id: string; name: string }[];
 }

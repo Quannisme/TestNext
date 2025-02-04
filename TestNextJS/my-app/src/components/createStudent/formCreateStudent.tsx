@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, type ChangeEvent } from "react";
 import { Course, Student } from "@/types/course";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,7 +17,7 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
-import { X } from "lucide-react";
+import { X, Upload } from "lucide-react";
 import hookService from "./formCreateStudent.hook";
 import { DialogClose } from "@radix-ui/react-dialog";
 export default function AddStudentForm() {
@@ -32,7 +32,21 @@ export default function AddStudentForm() {
     selectCourses,
     removeCourse,
     handleCourseSelect,
+    file,
+    setFile,
   } = hookService();
+  const [image, setImage] = useState<string | null>(null);
+  const handleImageUpload = (event: ChangeEvent<HTMLInputElement>) => {
+    const filetemp = event.target.files?.[0];
+    if (filetemp) {
+      setFile(filetemp);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImage(reader.result as string);
+      };
+      reader.readAsDataURL(filetemp);
+    }
+  };
   return (
     <Card className="w-full max-w-lg mx-auto">
       <CardHeader>
@@ -40,6 +54,43 @@ export default function AddStudentForm() {
       </CardHeader>
       <form onSubmit={handleSubmit(onSubmit)}>
         <CardContent className="space-y-4">
+          {/* Image Upload */}
+          <div className="space-y-2">
+            <label htmlFor="image" className="text-sm font-medium">
+              Student Image
+            </label>
+            <div className="flex items-center space-x-4">
+              <div className="relative w-24 h-24 border-2 border-dashed border-gray-300 rounded-lg overflow-hidden">
+                {image ? (
+                  <img
+                    src={image || "/placeholder.svg"}
+                    alt="Student"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="flex items-center justify-center w-full h-full text-gray-400">
+                    <Upload className="w-8 h-8" />
+                  </div>
+                )}
+                <input
+                  type="file"
+                  id="image"
+                  accept="image/*"
+                  {...register("image")}
+                  onChange={handleImageUpload}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                />
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => document.getElementById("image")?.click()}
+              >
+                Upload Image
+              </Button>
+            </div>
+          </div>
+
           {/* Student Name */}
           <div className="space-y-2">
             <label htmlFor="name" className="text-sm font-medium">
