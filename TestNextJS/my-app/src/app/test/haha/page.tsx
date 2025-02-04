@@ -19,35 +19,33 @@ import { Button } from "@/components/ui/button";
 export default function Test() {
   return (
     <>
-      <h1 className="text-red-500">Hello world!</h1>
-      <Accordion type="single" collapsible>
-        <AccordionItem value="item-1">
-          <AccordionTrigger>Is it accessible?</AccordionTrigger>
-          <AccordionContent>
-            Yes. It adheres to the WAI-ARIA design pattern.
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
-      <Button variant="secondary">Secondary</Button>
-      <Table>
-        <TableCaption>A list of your recent invoices.</TableCaption>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[100px]">Invoice</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Method</TableHead>
-            <TableHead className="text-right">Amount</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          <TableRow>
-            <TableCell className="font-medium">INV001</TableCell>
-            <TableCell>Paid</TableCell>
-            <TableCell>Credit Card</TableCell>
-            <TableCell className="text-right">$250.00</TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
+      <div className="mx-auto max-w-md overflow-hidden rounded-xl bg-white shadow-md">
+        <div>
+          <div>
+            <img
+              className="h-48 w-full object-cover"
+              src="https://cdn.popsww.com/blog/sites/2/2022/01/thanh-guom-diet-quy-review.jpg"
+              alt="Modern building architecture"
+            />
+          </div>
+          <div className="p-8">
+            <div className="text-sm font-semibold tracking-wide text-indigo-500 uppercase">
+              Company retreats
+            </div>
+            <a
+              href="#"
+              className="mt-1 block text-lg leading-tight font-medium text-black hover:underline"
+            >
+              Incredible accommodation for your team
+            </a>
+            <p className="mt-2 text-gray-500">
+              Looking to take your team away on a retreat to enjoy awesome food
+              and take in some sunshine? We have a list of places to do just
+              that.
+            </p>
+          </div>
+        </div>
+      </div>
     </>
   );
 }

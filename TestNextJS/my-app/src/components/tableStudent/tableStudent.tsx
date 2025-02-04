@@ -2,13 +2,14 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select } from "@/components/ui/select";
 import { motion } from "framer-motion";
 import { toast } from "react-toastify";
 import * as service from "../../service/student.service";
+import AddStudentDialog from "../ui/buttonCreate";
+import { Course, Student } from "@/types/course";
 
 export default function InvoiceTable() {
-  const [students, setStudents] = useState([]);
+  const [students, setStudents] = useState<Student[]>([]);
   useEffect(() => {
     getAll();
   }, []);
@@ -20,9 +21,7 @@ export default function InvoiceTable() {
   };
   const deleteStudent = async (id: string) => {
     const result = await service.deleteStudent(id);
-    console.log("2", result.message);
     if (result.message === "success") {
-      console.log("kakakak");
       toast.success("Deleted Successfully");
     }
     getAll();
@@ -43,22 +42,12 @@ export default function InvoiceTable() {
               className="w-[150px]"
               defaultValue="2019-12-11"
             />
-            <Select>
-              <option value="all">All Status</option>
-              <option value="draft">Draft</option>
-              <option value="paid">Paid</option>
-              <option value="partial">Partial Payment</option>
-            </Select>
+            <AddStudentDialog />
           </div>
         </div>
-        <img
-          src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-wUhd59Res6pFsHh0fYERcPg0n0fZZk.png"
-          alt="Decorative illustration"
-          className="absolute right-0 top-0 h-full w-auto opacity-10"
-        />
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm overflow-x-auto">
+      <div className="flex flex-row sm:flex-row bg-white rounded-lg shadow-sm overflow-x-auto">
         <motion.table
           className="w-full"
           initial={{ opacity: 0, y: 20 }}
@@ -115,7 +104,7 @@ export default function InvoiceTable() {
                         key={index}
                         className="flex gap-2 items-center text-gray-500"
                       >
-                        {course.id}
+                        {course.name}
                       </div>
                     );
                   })}
