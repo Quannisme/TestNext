@@ -11,3 +11,8 @@ export interface Student {
   image: string;
   courses: { id: string; name: string }[];
 }
+export type SearchFilters = {
+  keyword: string;
+  location: string;
+  category: string;
+};
